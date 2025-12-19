@@ -1,4 +1,4 @@
-#  Project Steward: HUMAN404
+#  Project : HUMAN404
 
 > **Team HUMAN404** | 基於 Model Context Protocol (MCP) 的跨部門超級協作中樞
 
