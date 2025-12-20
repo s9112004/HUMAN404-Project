@@ -1,0 +1,102 @@
+version: '3'
+
+services:
+  # ----------------------------------------
+  # 1. 核心大腦 (API Service)
+  # ----------------------------------------
+  api:
+    image: langgenius/dify-api:latest
+    restart: always
+    environment:
+      # 讀取 .env 變數
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${POSTGRES_DB}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # 關鍵：啟用 pgvector
+      VECTOR_STORE: pgvector
+      SECRET_KEY: ${SECRET_KEY}
+      CONSOLE_API_URL: ${CONSOLE_API_URL}
+      CONSOLE_WEB_URL: ${CONSOLE_WEB_URL}
+      SERVICE_API_URL: ${SERVICE_API_URL}
+      APP_API_URL: ${APP_API_URL}
+    depends_on:
+      - db
+      - redis
+    volumes:
+      # 讓上傳的 PDF 檔案落地儲存
+      - ./volumes/app/storage:/app/api/storage
+
+  # ----------------------------------------
+  # 2. 任務執行者 (Worker)
+  # ----------------------------------------
+  worker:
+    image: langgenius/dify-api:latest
+    restart: always
+    command: celery -A app.celery worker -P gevent -c 1 -Q dataset,generation,mail --loglevel INFO
+    environment:
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_HOST: db
+      DB_DATABASE: ${POSTGRES_DB}
+      REDIS_HOST: redis
+      VECTOR_STORE: pgvector
+      SECRET_KEY: ${SECRET_KEY}
+    depends_on:
+      - db
+      - redis
+
+  # ----------------------------------------
+  # 3. 前端介面 (Web UI)
+  # ----------------------------------------
+  web:
+    image: langgenius/dify-web:latest
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      CONSOLE_API_URL: ${CONSOLE_API_URL}
+      APP_API_URL: ${APP_API_URL}
+
+  # ----------------------------------------
+  # 4. 記憶中樞 (Database) - P3 重點看護
+  # ----------------------------------------
+  db:
+    image: pgvector/pgvector:pg16
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      # [重要] 資料庫檔案寫入本機 HUMAN404-Project/docker/volumes/db
+      - ./volumes/db/data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # ----------------------------------------
+  # 5. 極速快取 (Redis)
+  # ----------------------------------------
+  redis:
+    image: redis:6-alpine
+    restart: always
+    volumes:
+      - ./volumes/redis/data:/data
+    command: redis-server --appendonly yes --requirepass ""
+
+  # ----------------------------------------
+  # 6. 對外窗口 (Nginx)
+  # ----------------------------------------
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "5001:5001"
+    depends_on:
+      - api
+      - web
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
