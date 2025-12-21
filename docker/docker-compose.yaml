@@ -3,6 +3,7 @@ version: '3'
 services:
   # ----------------------------------------
   # 1. 核心大腦 (API Service)
+  # test
   # ----------------------------------------
   api:
     image: langgenius/dify-api:latest
