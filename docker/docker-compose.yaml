@@ -22,6 +22,8 @@ services:
       CONSOLE_WEB_URL: ${CONSOLE_WEB_URL}
       SERVICE_API_URL: ${SERVICE_API_URL}
       APP_API_URL: ${APP_API_URL}
+      STORAGE_TYPE: ${STORAGE_TYPE}
+      STORAGE_LOCAL_ROOT: ${STORAGE_LOCAL_ROOT}
     depends_on:
       - db
       - redis
@@ -44,9 +46,13 @@ services:
       REDIS_HOST: redis
       VECTOR_STORE: pgvector
       SECRET_KEY: ${SECRET_KEY}
+      STORAGE_TYPE: ${STORAGE_TYPE}
+      STORAGE_LOCAL_ROOT: ${STORAGE_LOCAL_ROOT}
     depends_on:
       - db
       - redis
+    volumes:
+      - ./volumes/app/storage:/app/api/storage
 
   # ----------------------------------------
   # 3. 前端介面 (Web UI)
