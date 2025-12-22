@@ -22,9 +22,13 @@ services:
       CONSOLE_WEB_URL: ${CONSOLE_WEB_URL}
       SERVICE_API_URL: ${SERVICE_API_URL}
       APP_API_URL: ${APP_API_URL}
+      STORAGE_TYPE: ${STORAGE_TYPE}
+      STORAGE_LOCAL_ROOT: ${STORAGE_LOCAL_ROOT}
+      DIFY_PLUGIN_DAEMON_URL: http://plugin_daemon:5002
     depends_on:
       - db
       - redis
+      - plugin_daemon
     volumes:
       # 讓上傳的 PDF 檔案落地儲存
       - ./volumes/app/storage:/app/api/storage
@@ -44,9 +48,15 @@ services:
       REDIS_HOST: redis
       VECTOR_STORE: pgvector
       SECRET_KEY: ${SECRET_KEY}
+      STORAGE_TYPE: ${STORAGE_TYPE}
+      STORAGE_LOCAL_ROOT: ${STORAGE_LOCAL_ROOT}
+      DIFY_PLUGIN_DAEMON_URL: http://plugin_daemon:5002
     depends_on:
       - db
       - redis
+      - plugin_daemon
+    volumes:
+      - ./volumes/app/storage:/app/api/storage
 
   # ----------------------------------------
   # 3. 前端介面 (Web UI)
@@ -99,3 +109,46 @@ services:
       - web
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
+
+  # ----------------------------------------
+  # 7. 插件守護進程 (Plugin Daemon)
+  # ----------------------------------------
+  plugin_daemon:
+    image: langgenius/dify-plugin-daemon:0.4.1-local
+    restart: always
+    environment:
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${POSTGRES_DB}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SERVER_KEY: ${SECRET_KEY}
+      MAX_REQUESTS: 10000
+      MAX_REQUESTS_JITTER: 1000
+      MAX_LIFETIME: 3600
+      MAX_LIFETIME_JITTER: 600
+      WORKERS: 1
+      PYTHONPATH: /app
+      SSRF_PROXY_HTTP_URL: http://ssrf_proxy:3128
+      SSRF_PROXY_HTTPS_URL: http://ssrf_proxy:3128
+      DIFY_INNER_API_URL: http://api:5001
+      DIFY_INNER_API_KEY: ${SECRET_KEY}
+      PLUGIN_REMOTE_INSTALLING_HOST: 0.0.0.0
+      PLUGIN_REMOTE_INSTALLING_PORT: 5003
+      PLUGIN_WORKING_PATH: /app/plugin_workspace
+    depends_on:
+      - db
+      - ssrf_proxy
+
+  # ----------------------------------------
+  # 8. SSRF Proxy
+  # ----------------------------------------
+  ssrf_proxy:
+    image: ubuntu/squid:latest
+    restart: always
+    ports:
+      - "3128:3128"
+    volumes:
+      - ./volumes/ssrf_proxy/squid.conf:/etc/squid/squid.conf

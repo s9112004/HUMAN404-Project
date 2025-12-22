@@ -1,0 +1,101 @@
+rank,name,symbol,industry,market_cap_usd_billions,country
+1,Apple,AAPL,Technology,3400.00,USA
+2,Microsoft,MSFT,Technology,3300.00,USA
+3,NVIDIA,NVDA,Technology,3100.00,USA
+4,Alphabet (Google),GOOGL,Technology,2200.00,USA
+5,Amazon,AMZN,Technology,2100.00,USA
+6,Saudi Aramco,2222.SR,Energy,1900.00,Saudi Arabia
+7,Meta Platforms,META,Technology,1400.00,USA
+8,TSMC,TSM,Semiconductor,1000.00,Taiwan
+9,Berkshire Hathaway,BRK.B,Financials,980.00,USA
+10,Broadcom,AVGO,Technology,800.00,USA
+11,Tesla,TSLA,Automotive,750.00,USA
+12,Eli Lilly,LLY,Healthcare,850.00,USA
+13,Novo Nordisk,NVO,Healthcare,600.00,Denmark
+14,JPMorgan Chase,JPM,Financials,600.00,USA
+15,Visa,V,Financials,550.00,USA
+16,Walmart,WMT,Retail,540.00,USA
+17,ExxonMobil,XOM,Energy,530.00,USA
+18,Tencent,TCEHY,Technology,450.00,China
+19,UnitedHealth Group,UNH,Healthcare,480.00,USA
+20,Mastercard,MA,Financials,440.00,USA
+21,Procter & Gamble,PG,Consumer Goods,400.00,USA
+22,Johnson & Johnson,JNJ,Healthcare,370.00,USA
+23,Samsung Electronics,005930.KS,Technology,350.00,South Korea
+24,Home Depot,HD,Retail,360.00,USA
+25,Costco,COST,Retail,380.00,USA
+26,Oracle,ORCL,Technology,380.00,USA
+27,AbbVie,ABBV,Healthcare,330.00,USA
+28,Merck & Co.,MRK,Healthcare,330.00,USA
+29,ASML,ASML,Semiconductor,350.00,Netherlands
+30,LVMH,LVMUY,Consumer Goods,360.00,France
+31,Chevron,CVX,Energy,290.00,USA
+32,Toyota,TM,Automotive,300.00,Japan
+33,Coca-Cola,KO,Consumer Goods,280.00,USA
+34,PepsiCo,PEP,Consumer Goods,230.00,USA
+35,Bank of America,BAC,Financials,300.00,USA
+36,Netflix,NFLX,Technology,290.00,USA
+37,Salesforce,CRM,Technology,280.00,USA
+38,Adobe,ADBE,Technology,240.00,USA
+39,AMD,AMD,Semiconductor,250.00,USA
+40,SAP,SAP,Technology,230.00,Germany
+41,Roche,RHHBY,Healthcare,240.00,Switzerland
+42,Shell,SHEL,Energy,220.00,UK
+43,McDonald's,MCD,Consumer Services,200.00,USA
+44,Thermo Fisher Scientific,TMO,Healthcare,220.00,USA
+45,Cisco,CSCO,Technology,190.00,USA
+46,Wells Fargo,WFC,Financials,200.00,USA
+47,Abbott Laboratories,ABT,Healthcare,190.00,USA
+48,Novartis,NVS,Healthcare,230.00,Switzerland
+49,Linde,LIN,Materials,210.00,UK
+50,Hermès,HESAY,Consumer Goods,220.00,France
+51,Accenture,ACN,Technology,200.00,Ireland
+52,Pfizer,PFE,Healthcare,160.00,USA
+53,Reliance Industries,RELIANCE.NS,Conglomerate,210.00,India
+54,TotalEnergies,TTE,Energy,160.00,France
+55,Disney,DIS,Consumer Services,170.00,USA
+56,Danaher,DHR,Healthcare,190.00,USA
+57,Comcast,CMCSA,Telecommunications,150.00,USA
+58,Nike,NKE,Consumer Goods,140.00,USA
+59,Verizon,VZ,Telecommunications,170.00,USA
+60,Intel,INTC,Technology,130.00,USA
+61,Qualcomm,QCOM,Semiconductor,200.00,USA
+62,IBM,IBM,Technology,160.00,USA
+63,Texas Instruments,TXN,Semiconductor,170.00,USA
+64,Morgan Stanley,MS,Financials,160.00,USA
+65,BHP Group,BHP,Materials,140.00,Australia
+66,Intuit,INTU,Technology,180.00,USA
+67,Caterpillar,CAT,Industrials,160.00,USA
+68,Union Pacific,UNP,Transportation,140.00,USA
+69,Amgen,AMGN,Healthcare,170.00,USA
+70,L'Oréal,LRLCY,Consumer Goods,200.00,France
+71,Siemens,SIEGY,Industrials,150.00,Germany
+72,Applied Materials,AMAT,Semiconductor,180.00,USA
+73,General Electric,GE,Industrials,180.00,USA
+74,Uber,UBER,Technology,150.00,USA
+75,Goldman Sachs,GS,Financials,150.00,USA
+76,Honeywell,HON,Industrials,130.00,USA
+77,Alibaba,BABA,Technology,190.00,China
+78,China Mobile,0941.HK,Telecommunications,180.00,China
+79,ICBC,1398.HK,Financials,220.00,China
+80,Pinduoduo,PDD,Technology,180.00,China
+81,Booking Holdings,BKNG,Consumer Services,140.00,USA
+82,ServiceNow,NOW,Technology,160.00,USA
+83,Sony,SONY,Technology,110.00,Japan
+84,American Express,AXP,Financials,170.00,USA
+85,Philip Morris,PM,Consumer Goods,160.00,USA
+86,Kweichow Moutai,600519.SS,Consumer Goods,250.00,China
+87,PetroChina,0857.HK,Energy,170.00,China
+88,Agricultural Bank of China,1288.HK,Financials,180.00,China
+89,Bank of China,3988.HK,Financials,160.00,China
+90,HSBC,HSBC,Financials,160.00,UK
+91,Unilever,UL,Consumer Goods,130.00,UK
+92,BP,BP,Energy,100.00,UK
+93,Airbus,EADSY,Industrials,120.00,France
+94,Christian Dior,CHDRY,Consumer Goods,140.00,France
+95,Volkswagen,VWAGY,Automotive,70.00,Germany
+96,Inditex (Zara),IDEXY,Retail,150.00,Spain
+97,SoftBank,SFTBY,Technology,100.00,Japan
+98,Keyence,KYCCF,Technology,110.00,Japan
+99,Mitsubishi UFJ,MUFG,Financials,100.00,Japan
+100,TATA Consultancy Services,TCS.NS,Technology,170.00,India

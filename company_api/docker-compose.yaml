@@ -1,0 +1,17 @@
+version: '3'
+services:
+  company-api:
+    build: .
+    ports:
+      - "5005:5005"
+    environment:
+      - DB_HOST=docker-db_postgres-1
+      - DB_NAME=dify
+      - DB_USER=postgres
+      - DB_PASS=difyai123456
+    networks:
+      - docker_default
+
+networks:
+  docker_default:
+    external: true
