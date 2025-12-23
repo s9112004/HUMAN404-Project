@@ -1,0 +1,1686 @@
+app:
+  description: All in one.
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: workflow
+  name: AWS Project
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/gemini:0.7.1@48bf314aad49c68acee6545f34b6ddb652c33e7da457dfb197ac514065e776e4
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/serper:0.0.2@a1776aefac753acc467b304058a143b9eefa13069124e39e07d15a7091a13fd9
+    version: null
+kind: app
+version: 0.5.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: parameter-extractor
+      id: 1766457459954-source-1766459464266-target
+      selected: false
+      source: '1766457459954'
+      sourceHandle: source
+      target: '1766459464266'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: question-classifier
+      id: 1766459464266-source-1766459864226-target
+      selected: false
+      source: '1766459464266'
+      sourceHandle: source
+      target: '1766459864226'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: end
+      id: 1766459864226-1-1766460252053-target
+      selected: false
+      source: '1766459864226'
+      sourceHandle: '1'
+      target: '1766460252053'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: end
+      id: 1766459864226-2-1766460252053-target
+      selected: false
+      source: '1766459864226'
+      sourceHandle: '2'
+      target: '1766460252053'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: end
+      id: 1766459864226-1766459904046-1766460252053-target
+      selected: false
+      source: '1766459864226'
+      sourceHandle: '1766459904046'
+      target: '1766460252053'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: tool
+      id: 1766459864226-1-1766460328888-target
+      selected: false
+      source: '1766459864226'
+      sourceHandle: '1'
+      target: '1766460328888'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: llm
+      id: 1766460328888-source-1766460731866-target
+      selected: false
+      source: '1766460328888'
+      sourceHandle: source
+      target: '1766460731866'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: end
+      id: 1766460731866-source-1766461156024-target
+      selected: false
+      source: '1766460731866'
+      sourceHandle: source
+      target: '1766461156024'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: question-classifier
+      id: 1766459864226-1766459904046-1766461784571-target
+      selected: false
+      source: '1766459864226'
+      sourceHandle: '1766459904046'
+      target: '1766461784571'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: tool
+      id: 1766461784571-2-1766461833854-target
+      selected: false
+      source: '1766461784571'
+      sourceHandle: '2'
+      target: '1766461833854'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: tool
+        targetType: end
+      id: 1766461833854-source-1766462245169-target
+      source: '1766461833854'
+      sourceHandle: source
+      target: '1766462245169'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: parameter-extractor
+      id: 1766461784571-1766461847901-1766462566969-target
+      selected: false
+      source: '1766461784571'
+      sourceHandle: '1766461847901'
+      target: '1766462566969'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: parameter-extractor
+      id: 1766461784571-1766461845591-1766462725243-target
+      selected: false
+      source: '1766461784571'
+      sourceHandle: '1766461845591'
+      target: '1766462725243'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: parameter-extractor
+      id: 1766461784571-1766461896946-1766462895988-target
+      source: '1766461784571'
+      sourceHandle: '1766461896946'
+      target: '1766462895988'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: knowledge-retrieval
+      id: 1766459864226-2-1766463389431-target
+      source: '1766459864226'
+      sourceHandle: '2'
+      target: '1766463389431'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1766463389431-source-1766463484782-target
+      source: '1766463389431'
+      sourceHandle: source
+      target: '1766463484782'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: end
+      id: 1766463484782-source-1766463527286-target
+      source: '1766463484782'
+      sourceHandle: source
+      target: '1766463527286'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: end
+      id: 1766463389431-source-1766463593613-target
+      source: '1766463389431'
+      sourceHandle: source
+      target: '1766463593613'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: end
+      id: 1766462725243-source-1766468754209-target
+      selected: false
+      source: '1766462725243'
+      sourceHandle: source
+      target: '1766468754209'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: tool
+      id: 1766462725243-source-1766469700998-target
+      selected: false
+      source: '1766462725243'
+      sourceHandle: source
+      target: '1766469700998'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: tool
+        targetType: end
+      id: 1766469700998-source-1766469716330-target
+      source: '1766469700998'
+      sourceHandle: source
+      target: '1766469716330'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: parameter-extractor
+      id: 1766461784571-1-1766470678619-target
+      source: '1766461784571'
+      sourceHandle: '1'
+      target: '1766470678619'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: end
+      id: 1766462566969-source-1766470977074-target
+      selected: false
+      source: '1766462566969'
+      sourceHandle: source
+      target: '1766470977074'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: end
+      id: 1766462895988-source-1766471014257-target
+      source: '1766462895988'
+      sourceHandle: source
+      target: '1766471014257'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: tool
+      id: 1766462566969-source-1766471046692-target
+      source: '1766462566969'
+      sourceHandle: source
+      target: '1766471046692'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: tool
+      id: 1766462895988-source-1766471070091-target
+      source: '1766462895988'
+      sourceHandle: source
+      target: '1766471070091'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: end
+      id: 1766471070091-source-1766462962861-target
+      source: '1766471070091'
+      sourceHandle: source
+      target: '1766462962861'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: end
+      id: 1766471046692-source-1766462323595-target
+      source: '1766471046692'
+      sourceHandle: source
+      target: '1766462323595'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: tool
+      id: 1766470678619-source-1766471097789-target
+      source: '1766470678619'
+      sourceHandle: source
+      target: '1766471097789'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: end
+      id: 1766471097789-source-1766462069830-target
+      source: '1766471097789'
+      sourceHandle: source
+      target: '1766462069830'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: '指令格式：
+
+          1. 我是「職稱」，我要xxxxxxxxxx。
+
+          2. 我是「職稱」，幫我xxxxxxxxxx。
+
+          上下引號可以省略。'
+        selected: false
+        title: 使用者指令
+        type: start
+        variables:
+        - default: ''
+          hint: ''
+          label: command
+          max_length: 256
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: command
+      height: 185
+      id: '1766457459954'
+      position:
+        x: 68.09280797884884
+        y: 265.13921196827323
+      positionAbsolute:
+        x: 68.09280797884884
+        y: 265.13921196827323
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        instruction: '將職稱放到{Job}，要做的工作放到{Work}。
+
+          如果有要搜尋的東西放到{Search}。(沒有就不用這行)
+
+          如果有操作AWS的服務把{Is_op}寫成1，並把要操作的服務放到{Service}。(沒有就不用這行)'
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemini-2.5-flash
+          provider: langgenius/gemini/google
+        parameters:
+        - description: 職稱
+          name: Job
+          required: false
+          type: string
+        - description: work request
+          name: Work
+          required: false
+          type: string
+        - description: search keyword
+          name: Search
+          required: false
+          type: string
+        - description: AWS service
+          name: Service
+          required: false
+          type: string
+        - description: Operate AWS service
+          name: Is_op
+          required: false
+          type: string
+        query:
+        - '1766457459954'
+        - command
+        reasoning_mode: prompt
+        selected: false
+        title: 抽出關鍵字
+        type: parameter-extractor
+        vision:
+          enabled: false
+      height: 88
+      id: '1766459464266'
+      position:
+        x: 382
+        y: 282
+      positionAbsolute:
+        x: 382
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        classes:
+        - id: '1'
+          name: 往外部尋找資料
+        - id: '2'
+          name: 在內部尋找資料
+        - id: '1766459904046'
+          name: 使用aws服務
+        instruction: 根據{{#1766457459954.command#}}找出最適當的分類
+        instructions: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemini-2.5-flash
+          provider: langgenius/gemini/google
+        query_variable_selector:
+        - '1766459464266'
+        - Work
+        selected: false
+        title: 分類語意
+        type: question-classifier
+        vision:
+          enabled: false
+      height: 208
+      id: '1766459864226'
+      position:
+        x: 684
+        y: 282
+      positionAbsolute:
+        x: 684
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1766459464266'
+          - Job
+          value_type: string
+          variable: Job
+        - value_selector:
+          - '1766459464266'
+          - Work
+          value_type: string
+          variable: Work
+        - value_selector:
+          - '1766459464266'
+          - Search
+          value_type: string
+          variable: Search
+        - value_selector:
+          - '1766459464266'
+          - Service
+          value_type: string
+          variable: Service
+        - value_selector:
+          - '1766459464266'
+          - Is_op
+          value_type: string
+          variable: Is_op
+        selected: false
+        title: 第一個檢查站
+        type: end
+      height: 192
+      id: '1766460252053'
+      position:
+        x: 1058.4790448300455
+        y: -17.140785025823675
+      positionAbsolute:
+        x: 1058.4790448300455
+        y: -17.140785025823675
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        is_team_authorization: false
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: used for searching
+            ja_JP: used for searching
+            pt_BR: used for searching
+            zh_Hans: 用于搜索网页内容
+          label:
+            en_US: Query string
+            ja_JP: Query string
+            pt_BR: Query string
+            zh_Hans: 查询语句
+          llm_description: key words for searching
+          max: null
+          min: null
+          name: query
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        params:
+          query: ''
+        plugin_id: langgenius/serper
+        plugin_unique_identifier: langgenius/serper:0.0.2@a1776aefac753acc467b304058a143b9eefa13069124e39e07d15a7091a13fd9
+        provider_icon: /console/api/workspaces/current/plugin/icon?tenant_id=28e162f3-bc8e-4df8-ad7c-5dca365f65c9&filename=2b3892ad83c5e4dc342c060f3bd37067461728ef5e7abeeed8687e9fa7dcdc84.svg
+        provider_id: langgenius/serper/serper
+        provider_name: langgenius/serper/serper
+        provider_type: builtin
+        selected: false
+        title: Google search
+        tool_configurations: {}
+        tool_description: A tool for performing a Google search and extracting snippets
+          and webpages.Input should be a search query.
+        tool_label: Serper
+        tool_name: serper
+        tool_node_version: '2'
+        tool_parameters:
+          query:
+            type: mixed
+            value: '{{#1766459464266.Search#}}'
+        type: tool
+      height: 52
+      id: '1766460328888'
+      position:
+        x: 1063.7502480904125
+        y: 192.38954457376207
+      positionAbsolute:
+        x: 1063.7502480904125
+        y: 192.38954457376207
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1766460328888'
+          - json
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemini-2.5-flash
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: 4f7001e4-4609-4601-838b-7c4960720065
+          role: system
+          text: 分析並摘要與{{#1766459464266.Search#}}有關的內容
+        selected: false
+        structured_output_enabled: false
+        title: 分析外部網站資料
+        type: llm
+        vision:
+          configs:
+            detail: low
+            variable_selector:
+            - '1766460328888'
+            - files
+          enabled: true
+      height: 88
+      id: '1766460731866'
+      position:
+        x: 1369.3216766618407
+        y: 50.11485175110528
+      positionAbsolute:
+        x: 1369.3216766618407
+        y: 50.11485175110528
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1766460328888'
+          - json
+          value_type: array[object]
+          variable: json
+        - value_selector:
+          - '1766460731866'
+          - text
+          value_type: string
+          variable: text
+        - value_selector:
+          - '1766460731866'
+          - reasoning_content
+          value_type: string
+          variable: reasoning_content
+        selected: false
+        title: 外部資料檢查站
+        type: end
+      height: 140
+      id: '1766461156024'
+      position:
+        x: 1647.983235864037
+        y: -68.53501681440132
+      positionAbsolute:
+        x: 1647.983235864037
+        y: -68.53501681440132
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        classes:
+        - id: '1'
+          name: 搜尋資料庫內容
+        - id: '2'
+          name: 列出資料庫有哪些資料
+        - id: '1766461845591'
+          name: 新增資料
+        - id: '1766461847901'
+          name: 修改資料
+        - id: '1766461896946'
+          name: 刪除資料
+        instructions: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemini-2.5-flash
+          provider: langgenius/gemini/google
+        query_variable_selector:
+        - '1766459464266'
+        - Work
+        selected: false
+        title: 操作AWS RDS DB
+        type: question-classifier
+        vision:
+          enabled: false
+      height: 284
+      id: '1766461784571'
+      position:
+        x: 1058.4790448300455
+        y: 411.56347903773485
+      positionAbsolute:
+        x: 1058.4790448300455
+        y: 411.56347903773485
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        is_team_authorization: true
+        paramSchemas: []
+        params: {}
+        plugin_id: null
+        plugin_unique_identifier: null
+        provider_icon:
+          background: '#FEF7C3'
+          content: 🕵️
+        provider_id: 7d6ecfbb-36b5-4b7f-9477-845eff2bb80d
+        provider_name: Jason-aws-rdsDB
+        provider_type: api
+        selected: false
+        title: list_docs
+        tool_configurations: {}
+        tool_description: 查看目前資料庫有哪些資料 (會列出 ID 和標題)
+        tool_label: list_docs
+        tool_name: list_docs
+        tool_node_version: '2'
+        tool_parameters: {}
+        type: tool
+      height: 52
+      id: '1766461833854'
+      position:
+        x: 1369.3216766618407
+        y: 550.9904638215702
+      positionAbsolute:
+        x: 1369.3216766618407
+        y: 550.9904638215702
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1766471097789'
+          - json
+          value_type: array[object]
+          variable: json
+        - value_selector:
+          - '1766459464266'
+          - Work
+          value_type: string
+          variable: Work
+        selected: false
+        title: 在資料庫找什麼資料
+        type: end
+      height: 114
+      id: '1766462069830'
+      position:
+        x: 1969.3216766618407
+        y: 411.56347903773485
+      positionAbsolute:
+        x: 1969.3216766618407
+        y: 411.56347903773485
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1766461833854'
+          - json
+          value_type: array[object]
+          variable: json
+        - value_selector:
+          - '1766459464266'
+          - Work
+          value_type: string
+          variable: Work
+        selected: false
+        title: 列出資料庫搜尋結果
+        type: end
+      height: 114
+      id: '1766462245169'
+      position:
+        x: 1681.3037081157745
+        y: 550.9904638215702
+      positionAbsolute:
+        x: 1681.3037081157745
+        y: 550.9904638215702
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1766471046692'
+          - json
+          value_type: array[object]
+          variable: json
+        - value_selector:
+          - '1766459464266'
+          - Work
+          value_type: string
+          variable: Work
+        - value_selector:
+          - '1766462566969'
+          - DB_id
+          value_type: number
+          variable: DB_id
+        - value_selector:
+          - '1766462566969'
+          - Title
+          value_type: string
+          variable: Title
+        - value_selector:
+          - '1766462566969'
+          - Content
+          value_type: string
+          variable: Content
+        selected: false
+        title: 修改資料結果
+        type: end
+      height: 192
+      id: '1766462323595'
+      position:
+        x: 1981.3037081157745
+        y: 1009.4102545859636
+      positionAbsolute:
+        x: 1981.3037081157745
+        y: 1009.4102545859636
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        instruction: 將要修改的位置放到{DB_id}，標題放到{Title}，內容放到{Content}
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemini-2.5-flash
+          provider: langgenius/gemini/google
+        parameters:
+        - description: data id
+          name: DB_id
+          required: false
+          type: number
+        - description: title
+          name: Title
+          required: false
+          type: string
+        - description: content
+          name: Content
+          required: false
+          type: string
+        query:
+        - '1766459464266'
+        - Work
+        reasoning_mode: prompt
+        selected: false
+        title: 截取要改動的地方與內容
+        type: parameter-extractor
+        vision:
+          enabled: false
+      height: 88
+      id: '1766462566969'
+      position:
+        x: 1369.3216766618407
+        y: 813.786319770853
+      positionAbsolute:
+        x: 1369.3216766618407
+        y: 813.786319770853
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        instruction: 將要新增的內容放到{new_content}，標題放到{new_title}
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemini-2.5-flash
+          provider: langgenius/gemini/google
+        parameters:
+        - description: new content
+          name: new_content
+          required: false
+          type: string
+        - description: new title
+          name: new_title
+          required: false
+          type: string
+        query:
+        - '1766459464266'
+        - Work
+        reasoning_mode: prompt
+        selected: false
+        title: Parameter Extractor 3
+        type: parameter-extractor
+        vision:
+          enabled: false
+      height: 88
+      id: '1766462725243'
+      position:
+        x: 1369.3216766618407
+        y: 679.0526186822538
+      positionAbsolute:
+        x: 1369.3216766618407
+        y: 679.0526186822538
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        instruction: 將要刪除的資料id放到{delete_id}
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemini-2.5-flash
+          provider: langgenius/gemini/google
+        parameters:
+        - description: delete id
+          name: delete_id
+          required: false
+          type: number
+        query:
+        - '1766459464266'
+        - Work
+        reasoning_mode: prompt
+        selected: false
+        title: Parameter Extractor 4
+        type: parameter-extractor
+        vision:
+          enabled: false
+      height: 88
+      id: '1766462895988'
+      position:
+        x: 1369.3216766618407
+        y: 1039.8454771502838
+      positionAbsolute:
+        x: 1369.3216766618407
+        y: 1039.8454771502838
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1766471070091'
+          - json
+          value_type: array[object]
+          variable: json
+        - value_selector:
+          - '1766462895988'
+          - delete_id
+          value_type: number
+          variable: delete_id
+        selected: false
+        title: 刪除資料結果
+        type: end
+      height: 114
+      id: '1766462962861'
+      position:
+        x: 1981.3037081157745
+        y: 1225.8605189380828
+      positionAbsolute:
+        x: 1981.3037081157745
+        y: 1225.8605189380828
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        dataset_ids:
+        - tJ3O1F9419QzUUpHLeWzAjU94GjIFFEsjF68tF0MflILJ77XkrM3WgapmKiVs2ND
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: weighted_score
+          top_k: 4
+          weights:
+            keyword_setting:
+              keyword_weight: 0.3
+            vector_setting:
+              embedding_model_name: embedding-001
+              embedding_provider_name: langgenius/gemini/google
+              vector_weight: 0.7
+            weight_type: customized
+        query_attachment_selector: []
+        query_variable_selector:
+        - '1766459464266'
+        - Search
+        retrieval_mode: multiple
+        selected: false
+        title: 找內部資料
+        type: knowledge-retrieval
+      height: 90
+      id: '1766463389431'
+      position:
+        x: 1058.4790448300455
+        y: 297.7748815548783
+      positionAbsolute:
+        x: 1058.4790448300455
+        y: 297.7748815548783
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1766463389431'
+          - result
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemini-2.5-flash
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: 2161eb95-eabf-4ea4-a7a2-437ddba66f5b
+          role: system
+          text: 尋找內部資料
+        selected: false
+        title: 內部資料搜尋
+        type: llm
+        vision:
+          enabled: false
+      height: 88
+      id: '1766463484782'
+      position:
+        x: 1360.4790448300455
+        y: 297.7748815548783
+      positionAbsolute:
+        x: 1360.4790448300455
+        y: 297.7748815548783
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1766463484782'
+          - text
+          value_type: string
+          variable: text
+        selected: false
+        title: 內部資料搜集
+        type: end
+      height: 88
+      id: '1766463527286'
+      position:
+        x: 1662.4790448300455
+        y: 297.7748815548783
+      positionAbsolute:
+        x: 1662.4790448300455
+        y: 297.7748815548783
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        desc: 觀察是否還需要一個LLM
+        outputs:
+        - value_selector:
+          - '1766463389431'
+          - result
+          value_type: array[object]
+          variable: result
+        selected: false
+        title: 中繼站
+        type: end
+      height: 116
+      id: '1766463593613'
+      position:
+        x: 1369.3216766618407
+        y: 163.44572184899445
+      positionAbsolute:
+        x: 1369.3216766618407
+        y: 163.44572184899445
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1766462725243'
+          - new_content
+          value_type: string
+          variable: new_content
+        - value_selector:
+          - '1766462725243'
+          - new_title
+          value_type: string
+          variable: new_title
+        selected: false
+        title: 檢查是否正確提取資料
+        type: end
+      height: 114
+      id: '1766468754209'
+      position:
+        x: 1681.3037081157745
+        y: 672.7870868468075
+      positionAbsolute:
+        x: 1681.3037081157745
+        y: 672.7870868468075
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        is_team_authorization: true
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          label:
+            en_US: title
+            ja_JP: title
+            pt_BR: title
+            zh_Hans: title
+          llm_description: ''
+          max: null
+          min: null
+          name: title
+          options: []
+          placeholder:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          label:
+            en_US: content
+            ja_JP: content
+            pt_BR: content
+            zh_Hans: content
+          llm_description: ''
+          max: null
+          min: null
+          name: content
+          options: []
+          placeholder:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        params:
+          content: ''
+          title: ''
+        plugin_id: null
+        plugin_unique_identifier: null
+        provider_icon:
+          background: '#FEF7C3'
+          content: 🕵️
+        provider_id: 08accee0-0694-431a-bbd7-500c81a069dd
+        provider_name: Jason-aws-mcp
+        provider_type: api
+        selected: false
+        title: add_doc_db_add_post
+        tool_configurations: {}
+        tool_description: Add Doc
+        tool_label: add_doc_db_add_post
+        tool_name: add_doc_db_add_post
+        tool_node_version: '2'
+        tool_parameters:
+          content:
+            type: mixed
+            value: '{{#1766462725243.new_content#}}'
+          title:
+            type: mixed
+            value: '{{#1766462725243.new_title#}}'
+        type: tool
+      height: 52
+      id: '1766469700998'
+      position:
+        x: 1681.3037081157745
+        y: 825.7870868468075
+      positionAbsolute:
+        x: 1681.3037081157745
+        y: 825.7870868468075
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1766469700998'
+          - json
+          value_type: array[object]
+          variable: json
+        selected: false
+        title: Output 10
+        type: end
+      height: 88
+      id: '1766469716330'
+      position:
+        x: 1981.3037081157745
+        y: 690.2710649637141
+      positionAbsolute:
+        x: 1981.3037081157745
+        y: 690.2710649637141
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        instruction: 取出使用者想找到的資料是什麼
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gemini-2.5-flash
+          provider: langgenius/gemini/google
+        parameters:
+        - description: data user want to find
+          name: find_data
+          required: false
+          type: string
+        query:
+        - '1766457459954'
+        - command
+        reasoning_mode: prompt
+        selected: false
+        title: Parameter Extractor 5
+        type: parameter-extractor
+        vision:
+          enabled: false
+      height: 88
+      id: '1766470678619'
+      position:
+        x: 1369.3216766618407
+        y: 428.72266217302024
+      positionAbsolute:
+        x: 1369.3216766618407
+        y: 428.72266217302024
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1766462566969'
+          - DB_id
+          value_type: number
+          variable: DB_id
+        - value_selector:
+          - '1766462566969'
+          - Title
+          value_type: string
+          variable: Title
+        - value_selector:
+          - '1766462566969'
+          - Content
+          value_type: string
+          variable: Content
+        selected: false
+        title: 檢查改動的東西
+        type: end
+      height: 140
+      id: '1766470977074'
+      position:
+        x: 1681.3037081157745
+        y: 895.7516555872401
+      positionAbsolute:
+        x: 1681.3037081157745
+        y: 895.7516555872401
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1766462895988'
+          - delete_id
+          value_type: number
+          variable: delete_id
+        selected: false
+        title: 檢查刪除的東西
+        type: end
+      height: 88
+      id: '1766471014257'
+      position:
+        x: 1681.3037081157745
+        y: 1121.8108129666712
+      positionAbsolute:
+        x: 1681.3037081157745
+        y: 1121.8108129666712
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        is_team_authorization: true
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          label:
+            en_US: id
+            ja_JP: id
+            pt_BR: id
+            zh_Hans: id
+          llm_description: ''
+          max: null
+          min: null
+          name: id
+          options: []
+          placeholder:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: number
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          label:
+            en_US: title
+            ja_JP: title
+            pt_BR: title
+            zh_Hans: title
+          llm_description: ''
+          max: null
+          min: null
+          name: title
+          options: []
+          placeholder:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          label:
+            en_US: content
+            ja_JP: content
+            pt_BR: content
+            zh_Hans: content
+          llm_description: ''
+          max: null
+          min: null
+          name: content
+          options: []
+          placeholder:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        params:
+          content: ''
+          id: ''
+          title: ''
+        plugin_id: null
+        plugin_unique_identifier: null
+        provider_icon:
+          background: '#FEF7C3'
+          content: 🕵️
+        provider_id: 08accee0-0694-431a-bbd7-500c81a069dd
+        provider_name: Jason-aws-mcp
+        provider_type: api
+        selected: false
+        title: update_doc_db_update_post
+        tool_configurations: {}
+        tool_description: Update Doc
+        tool_label: update_doc_db_update_post
+        tool_name: update_doc_db_update_post
+        tool_node_version: '2'
+        tool_parameters:
+          content:
+            type: mixed
+            value: '{{#1766462566969.Content#}}'
+          id:
+            type: variable
+            value:
+            - '1766462566969'
+            - DB_id
+          title:
+            type: mixed
+            value: '{{#1766462566969.Title#}}'
+        type: tool
+      height: 52
+      id: '1766471046692'
+      position:
+        x: 1681.3037081157745
+        y: 1047.4298769817776
+      positionAbsolute:
+        x: 1681.3037081157745
+        y: 1047.4298769817776
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        is_team_authorization: true
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          label:
+            en_US: id
+            ja_JP: id
+            pt_BR: id
+            zh_Hans: id
+          llm_description: ''
+          max: null
+          min: null
+          name: id
+          options: []
+          placeholder:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: number
+        params:
+          id: ''
+        plugin_id: null
+        plugin_unique_identifier: null
+        provider_icon:
+          background: '#FEF7C3'
+          content: 🕵️
+        provider_id: 08accee0-0694-431a-bbd7-500c81a069dd
+        provider_name: Jason-aws-mcp
+        provider_type: api
+        selected: false
+        title: delete_doc_db_delete_post
+        tool_configurations: {}
+        tool_description: Delete Doc
+        tool_label: delete_doc_db_delete_post
+        tool_name: delete_doc_db_delete_post
+        tool_node_version: '2'
+        tool_parameters:
+          id:
+            type: variable
+            value:
+            - '1766462895988'
+            - delete_id
+        type: tool
+      height: 52
+      id: '1766471070091'
+      position:
+        x: 1681.3037081157745
+        y: 1225.8605189380828
+      positionAbsolute:
+        x: 1681.3037081157745
+        y: 1225.8605189380828
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        is_team_authorization: true
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          label:
+            en_US: keyword
+            ja_JP: keyword
+            pt_BR: keyword
+            zh_Hans: keyword
+          llm_description: ''
+          max: null
+          min: null
+          name: keyword
+          options: []
+          placeholder:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        params:
+          keyword: ''
+        plugin_id: null
+        plugin_unique_identifier: null
+        provider_icon:
+          background: '#FEF7C3'
+          content: 🕵️
+        provider_id: 08accee0-0694-431a-bbd7-500c81a069dd
+        provider_name: Jason-aws-mcp
+        provider_type: api
+        selected: false
+        title: search_docs_db_search_post
+        tool_configurations: {}
+        tool_description: Search Docs
+        tool_label: search_docs_db_search_post
+        tool_name: search_docs_db_search_post
+        tool_node_version: '2'
+        tool_parameters:
+          keyword:
+            type: mixed
+            value: '{{#1766470678619.find_data#}}'
+        type: tool
+      height: 52
+      id: '1766471097789'
+      position:
+        x: 1673.3775933184384
+        y: 416.81281307869017
+      positionAbsolute:
+        x: 1673.3775933184384
+        y: 416.81281307869017
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: 10.424795021734667
+      y: 53.56159487025968
+      zoom: 1.0680672154871924
+  rag_pipeline_variables: []
