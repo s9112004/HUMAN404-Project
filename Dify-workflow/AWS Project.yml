@@ -473,7 +473,7 @@ workflow:
     - data:
         instruction: '將職稱放到{Job}，要做的工作放到{Work}。
 
-          如果有要搜尋的東西放到{Search}。(沒有就不用這行)
+          如果使用者想要查詢公開資訊或公司資料，請將關鍵字(例如:台積電、股價、財報)提取到{Search}。(沒有就不用這行)
 
           如果有操作AWS的服務把{Is_op}寫成1，並把要操作的服務放到{Service}。(沒有就不用這行)'
         model:
@@ -742,15 +742,15 @@ workflow:
     - data:
         classes:
         - id: '1'
-          name: 搜尋資料庫內容
+          name: 列出 S3 檔案
         - id: '2'
-          name: 列出資料庫有哪些資料
+          name: 列出 EC2 實例
         - id: '1766461845591'
-          name: 新增資料
+          name: 啟動 EC2
         - id: '1766461847901'
-          name: 修改資料
+          name: 停止 EC2
         - id: '1766461896946'
-          name: 刪除資料
+          name: 列出 S3 Buckets
         instructions: ''
         model:
           completion_params:
@@ -788,17 +788,19 @@ workflow:
         provider_icon:
           background: '#FEF7C3'
           content: 🕵️
-        provider_id: 7d6ecfbb-36b5-4b7f-9477-845eff2bb80d
-        provider_name: Jason-aws-rdsDB
+        provider_name: aws-lambda-manager
         provider_type: api
         selected: false
-        title: list_docs
+        title: list_ec2_instances
         tool_configurations: {}
-        tool_description: 查看目前資料庫有哪些資料 (會列出 ID 和標題)
-        tool_label: list_docs
-        tool_name: list_docs
-        tool_node_version: '2'
-        tool_parameters: {}
+        tool_description: List all EC2 instances
+        tool_label: list_ec2_instances
+        tool_name: list_ec2_instances_aws_ec2_list_get
+        tool_node_version: '1'
+        tool_parameters:
+          region:
+            type: mixed
+            value: ap-northeast-1
         type: tool
       height: 52
       id: '1766461833854'
@@ -1269,23 +1271,22 @@ workflow:
         provider_icon:
           background: '#FEF7C3'
           content: 🕵️
-        provider_id: 08accee0-0694-431a-bbd7-500c81a069dd
-        provider_name: Jason-aws-mcp
+        provider_name: aws-lambda-manager
         provider_type: api
         selected: false
-        title: add_doc_db_add_post
+        title: start_ec2_instance
         tool_configurations: {}
-        tool_description: Add Doc
-        tool_label: add_doc_db_add_post
-        tool_name: add_doc_db_add_post
-        tool_node_version: '2'
+        tool_description: Start EC2 Instance
+        tool_label: start_ec2_instance
+        tool_name: start_ec2_instance_aws_ec2_start_post
+        tool_node_version: '1'
         tool_parameters:
-          content:
-            type: mixed
-            value: '{{#1766462725243.new_content#}}'
-          title:
+          instance_id:
             type: mixed
             value: '{{#1766462725243.new_title#}}'
+          region:
+            type: mixed
+            value: ap-northeast-1
         type: tool
       height: 52
       id: '1766469700998'
@@ -1509,28 +1510,24 @@ workflow:
         provider_icon:
           background: '#FEF7C3'
           content: 🕵️
-        provider_id: 08accee0-0694-431a-bbd7-500c81a069dd
-        provider_name: Jason-aws-mcp
+        provider_name: aws-lambda-manager
         provider_type: api
         selected: false
-        title: update_doc_db_update_post
+        title: stop_ec2_instance
         tool_configurations: {}
-        tool_description: Update Doc
-        tool_label: update_doc_db_update_post
-        tool_name: update_doc_db_update_post
-        tool_node_version: '2'
+        tool_description: Stop EC2 Instance
+        tool_label: stop_ec2_instance
+        tool_name: stop_ec2_instance_aws_ec2_stop_post
+        tool_node_version: '1'
         tool_parameters:
-          content:
-            type: mixed
-            value: '{{#1766462566969.Content#}}'
-          id:
+          instance_id:
             type: variable
             value:
             - '1766462566969'
             - DB_id
-          title:
+          region:
             type: mixed
-            value: '{{#1766462566969.Title#}}'
+            value: ap-northeast-1
         type: tool
       height: 52
       id: '1766471046692'
@@ -1583,22 +1580,16 @@ workflow:
         provider_icon:
           background: '#FEF7C3'
           content: 🕵️
-        provider_id: 08accee0-0694-431a-bbd7-500c81a069dd
-        provider_name: Jason-aws-mcp
+        provider_name: aws-lambda-manager
         provider_type: api
         selected: false
-        title: delete_doc_db_delete_post
+        title: list_s3_buckets
         tool_configurations: {}
-        tool_description: Delete Doc
-        tool_label: delete_doc_db_delete_post
-        tool_name: delete_doc_db_delete_post
-        tool_node_version: '2'
-        tool_parameters:
-          id:
-            type: variable
-            value:
-            - '1766462895988'
-            - delete_id
+        tool_description: List S3 Buckets
+        tool_label: list_s3_buckets
+        tool_name: list_s3_buckets_aws_s3_buckets_get
+        tool_node_version: '1'
+        tool_parameters: {}
         type: tool
       height: 52
       id: '1766471070091'
@@ -1651,18 +1642,17 @@ workflow:
         provider_icon:
           background: '#FEF7C3'
           content: 🕵️
-        provider_id: 08accee0-0694-431a-bbd7-500c81a069dd
-        provider_name: Jason-aws-mcp
+        provider_name: aws-lambda-manager
         provider_type: api
         selected: false
-        title: search_docs_db_search_post
+        title: list_s3_files
         tool_configurations: {}
-        tool_description: Search Docs
-        tool_label: search_docs_db_search_post
-        tool_name: search_docs_db_search_post
-        tool_node_version: '2'
+        tool_description: List S3 Files
+        tool_label: list_s3_files
+        tool_name: list_s3_files_aws_s3_files_post
+        tool_node_version: '1'
         tool_parameters:
-          keyword:
+          bucket_name:
             type: mixed
             value: '{{#1766470678619.find_data#}}'
         type: tool

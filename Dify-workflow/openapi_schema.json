@@ -1,0 +1,171 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AWS Resource Manager",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://b4dikemxltwdyigsihpxasgw6a0ekznf.lambda-url.ap-northeast-1.on.aws"
+    }
+  ],
+  "paths": {
+    "/aws/ec2/list": {
+      "get": {
+        "summary": "列出所有 EC2 實例狀態",
+        "operationId": "list_ec2_instances_aws_ec2_list_get",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "ap-northeast-1",
+              "title": "Region"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/aws/ec2/start": {
+      "post": {
+        "summary": "啟動 EC2 實例",
+        "operationId": "start_ec2_instance_aws_ec2_start_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EC2ActionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/aws/ec2/stop": {
+      "post": {
+        "summary": "停止 EC2 實例",
+        "operationId": "stop_ec2_instance_aws_ec2_stop_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EC2ActionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/aws/s3/buckets": {
+      "get": {
+        "summary": "列出所有 S3 Buckets",
+        "operationId": "list_s3_buckets_aws_s3_buckets_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/aws/s3/files": {
+      "post": {
+        "summary": "列出 Bucket 內的檔案",
+        "operationId": "list_s3_files_aws_s3_files_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/S3ListRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EC2ActionRequest": {
+        "properties": {
+          "instance_id": {
+            "type": "string",
+            "title": "Instance Id"
+          },
+          "region": {
+            "type": "string",
+            "title": "Region",
+            "default": "ap-northeast-1"
+          }
+        },
+        "type": "object",
+        "required": [
+          "instance_id"
+        ],
+        "title": "EC2ActionRequest"
+      },
+      "S3ListRequest": {
+        "properties": {
+          "bucket_name": {
+            "type": "string",
+            "title": "Bucket Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bucket_name"
+        ],
+        "title": "S3ListRequest"
+      }
+    }
+  }
+}

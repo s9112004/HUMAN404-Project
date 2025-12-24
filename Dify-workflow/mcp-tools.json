@@ -6,7 +6,7 @@
   },
 "servers": [
     {
-      "url": "https://fairy-stocks-cakes-warrior.trycloudflare.com"
+      "url": "http://host.docker.internal:8000"
     }
   ],
   "paths": {
@@ -45,6 +45,25 @@
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/db/list": {
+      "post": {
+        "tags": [
+          "Database"
+        ],
+        "summary": "List Docs",
+        "operationId": "list_docs",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           }

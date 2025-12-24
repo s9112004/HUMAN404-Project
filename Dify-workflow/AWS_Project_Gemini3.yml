@@ -1,0 +1,483 @@
+app:
+  description: 自動調度 AWS 資源 (EC2/S3) 並整合外部 Google 搜尋的智能助手 (Gemini 3 Pro Edition)。
+  icon: 🚀
+  icon_background: '#E0F2FE'
+  mode: workflow
+  name: AWS Intelligent Manager (Gemini 3)
+  use_icon_as_answer_icon: true
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/gemini:0.7.1
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/serper:0.0.2
+    version: null
+kind: app
+version: 0.5.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      enabled: false
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+  graph:
+    edges:
+    # Start -> Parameter Extractor
+    - id: edge-1
+      source: 'start-node'
+      sourceHandle: source
+      target: 'param-extractor'
+      targetHandle: target
+      type: custom
+    
+    # Extractor -> Intent Router
+    - id: edge-2
+      source: 'param-extractor'
+      sourceHandle: source
+      target: 'intent-router'
+      targetHandle: target
+      type: custom
+
+    # Router -> Google Search
+    - id: edge-route-web
+      source: 'intent-router'
+      sourceHandle: 'web-search'
+      target: 'tool-google-search'
+      targetHandle: target
+      type: custom
+
+    # Google Search -> Code Node (Translator) - NEW
+    - id: edge-search-to-code
+      source: 'tool-google-search'
+      sourceHandle: source
+      target: 'json-to-string'
+      targetHandle: target
+      type: custom
+
+    # Code Node -> LLM Summary - NEW
+    - id: edge-code-to-llm
+      source: 'json-to-string'
+      sourceHandle: source
+      target: 'llm-summary'
+      targetHandle: target
+      type: custom
+
+    # LLM Summary -> End
+    - id: edge-llm-to-end
+      source: 'llm-summary'
+      sourceHandle: source
+      target: 'end-node'
+      targetHandle: target
+      type: custom
+
+    # Router -> List EC2
+    - id: edge-route-list-ec2
+      source: 'intent-router'
+      sourceHandle: 'list-ec2'
+      target: 'tool-list-ec2'
+      targetHandle: target
+      type: custom
+
+    # Router -> Start EC2
+    - id: edge-route-start-ec2
+      source: 'intent-router'
+      sourceHandle: 'start-ec2'
+      target: 'tool-start-ec2'
+      targetHandle: target
+      type: custom
+
+    # Router -> Stop EC2
+    - id: edge-route-stop-ec2
+      source: 'intent-router'
+      sourceHandle: 'stop-ec2'
+      target: 'tool-stop-ec2'
+      targetHandle: target
+      type: custom
+
+    # Router -> List S3
+    - id: edge-route-list-s3
+      source: 'intent-router'
+      sourceHandle: 'list-s3'
+      target: 'tool-list-s3'
+      targetHandle: target
+      type: custom
+
+    # Tools -> End
+    - id: edge-end-list-ec2
+      source: 'tool-list-ec2'
+      sourceHandle: source
+      target: 'end-node'
+      targetHandle: target
+      type: custom
+    - id: edge-end-start-ec2
+      source: 'tool-start-ec2'
+      sourceHandle: source
+      target: 'end-node'
+      targetHandle: target
+      type: custom
+    - id: edge-end-stop-ec2
+      source: 'tool-stop-ec2'
+      sourceHandle: source
+      target: 'end-node'
+      targetHandle: target
+      type: custom
+    - id: edge-end-list-s3
+      source: 'tool-list-s3'
+      sourceHandle: source
+      target: 'end-node'
+      targetHandle: target
+      type: custom
+
+    nodes:
+    # 1. Start Node
+    - data:
+        title: 使用者指令
+        type: start
+        variables:
+        - label: command
+          variable: command
+          type: text-input
+          required: true
+          max_length: 500
+      height: 90
+      id: 'start-node'
+      position: {x: 50, y: 300}
+      positionAbsolute: {x: 50, y: 300}
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+
+    # 2. Parameter Extractor
+    - data:
+        title: 意圖與參數提取
+        type: parameter-extractor
+        instruction: |
+          你是一個精準的參數提取器。請分析使用者的指令 '{{#start-node.command#}}'。
+
+          1. **判斷意圖 (intent)**：
+             - 查詢資料/新聞/股價 -> "web_search"
+             - 列出/查看 EC2 -> "list_ec2"
+             - 開機/啟動 EC2 -> "start_ec2"
+             - 關機/停止 EC2 -> "stop_ec2"
+             - 列出 S3 -> "list_s3"
+
+          2. **提取關鍵參數**：
+             - **search_query**: 當 intent 為 "web_search" 時，提取查詢關鍵字。如果沒有明確關鍵字，請填入 "最新科技新聞" 以避免空值。
+             - **instance_id**: 當 intent 為 "start_ec2" 或 "stop_ec2" 時，提取使用者指定的機器 ID (如 i-0xxxx) 或機器名稱 (如 test、web-server)。
+             - **bucket_name**: 當 intent 為 "list_s3" 時提取。
+
+          請確保輸出 JSON 格式正確。
+        reasoning_mode: prompt
+        model:
+          mode: chat
+          name: gemini-3-pro-preview
+          provider: langgenius/gemini/google
+        parameters:
+        - name: intent
+          type: string
+          description: "web_search, list_ec2, start_ec2, stop_ec2, list_s3"
+          required: true
+        - name: search_query
+          type: string
+          description: "google search keyword"
+          required: true
+        - name: instance_id
+          type: string
+          description: "AWS EC2 Instance ID (e.g., i-12345...)"
+          required: false
+        - name: bucket_name
+          type: string
+          description: "S3 Bucket Name"
+          required: false
+        query:
+        - 'start-node'
+        - command
+      height: 90
+      id: 'param-extractor'
+      position: {x: 350, y: 300}
+      positionAbsolute: {x: 350, y: 300}
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+
+    # 3. Intent Router
+    - data:
+        title: 路由分流
+        type: question-classifier
+        classes:
+        - id: 'web-search'
+          name: 外部搜尋
+        - id: 'list-ec2'
+          name: 列出 EC2
+        - id: 'start-ec2'
+          name: 啟動 EC2
+        - id: 'stop-ec2'
+          name: 停止 EC2
+        - id: 'list-s3'
+          name: S3 操作
+        instruction: 根據變數 '{{#param-extractor.intent#}}' 進行分類。
+        model:
+          mode: chat
+          name: gemini-3-pro-preview
+          provider: langgenius/gemini/google
+        query_variable_selector:
+        - 'param-extractor'
+        - intent
+      height: 90
+      id: 'intent-router'
+      position: {x: 650, y: 300}
+      positionAbsolute: {x: 650, y: 300}
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+
+    # 4. Tools
+    # Route A: Google Search
+    - data:
+        title: Google 搜尋
+        type: tool
+        provider_id: langgenius/serper/serper
+        provider_name: langgenius/serper/serper
+        provider_type: builtin
+        tool_name: serper
+        tool_label: Google 搜尋
+        tool_configurations: {}
+        tool_parameters:
+          query:
+            type: variable
+            value:
+            - param-extractor
+            - search_query
+      height: 90
+      id: 'tool-google-search'
+      position: {x: 1000, y: 100}
+      positionAbsolute: {x: 1000, y: 100}
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+
+    # NEW: Code Node (JSON to String)
+    - data:
+        title: 翻譯官 (JSON轉字串)
+        type: code
+        code_language: python3
+        code: |
+          import json
+
+          def main(input_data):
+              # 把複雜的資料轉成純文字 (String)
+              try:
+                  text_content = json.dumps(input_data, ensure_ascii=False)
+              except:
+                  text_content = str(input_data)
+              
+              return {
+                  "result": text_content
+              }
+        variables:
+        - value_selector:
+          - tool-google-search
+          - json
+          variable: input_data
+        outputs:
+          result:
+            type: string
+      height: 90
+      id: 'json-to-string'
+      position: {x: 1300, y: 100}
+      positionAbsolute: {x: 1300, y: 100}
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+
+    # LLM Summary Node (Corrected)
+    - data:
+        title: 整理搜尋結果
+        type: llm
+        model:
+          mode: chat
+          name: gemini-3-pro-preview
+          provider: langgenius/gemini/google
+        prompt_template:
+        - role: user
+          text: |
+            你是一個專業的資訊整理助手。
+            
+            請閱讀下方的搜尋結果內容（Context），並為使用者撰寫一份簡潔明瞭的摘要。
+            如果內容為空或無法讀取，請直接回答「找不到相關資訊」。
+            
+            搜尋結果內容：
+            {{#context#}}
+        context:
+          enabled: true
+          variable_selector:
+          - json-to-string
+          - result
+        vision:
+          enabled: false
+      height: 90
+      id: 'llm-summary'
+      position: {x: 1600, y: 100}
+      positionAbsolute: {x: 1600, y: 100}
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+
+    # Route B: List EC2
+    - data:
+        title: 列出 EC2
+        type: tool
+        provider_id: a3f28be8-a0df-4d09-bb14-727311d7b56d
+        provider_name: aws-lambda-manager
+        provider_type: api
+        tool_name: list_ec2_instances_aws_ec2_list_get
+        tool_label: 列出 EC2
+        tool_configurations: {}
+        tool_parameters:
+          region:
+            type: mixed
+            value: 'ap-northeast-1'
+      height: 90
+      id: 'tool-list-ec2'
+      position: {x: 1000, y: 250}
+      positionAbsolute: {x: 1000, y: 250}
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+
+    # Route C: Start EC2
+    - data:
+        title: 啟動 EC2
+        type: tool
+        provider_id: a3f28be8-a0df-4d09-bb14-727311d7b56d
+        provider_name: aws-lambda-manager
+        provider_type: api
+        tool_name: start_ec2_instance_aws_ec2_start_post
+        tool_label: 啟動 EC2
+        tool_configurations: {}
+        tool_parameters:
+          instance_id:
+            type: variable
+            value:
+            - param-extractor
+            - instance_id
+          region:
+            type: mixed
+            value: 'ap-northeast-1'
+      height: 90
+      id: 'tool-start-ec2'
+      position: {x: 1000, y: 400}
+      positionAbsolute: {x: 1000, y: 400}
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+
+    # Route D: Stop EC2
+    - data:
+        title: 停止 EC2
+        type: tool
+        provider_id: a3f28be8-a0df-4d09-bb14-727311d7b56d
+        provider_name: aws-lambda-manager
+        provider_type: api
+        tool_name: stop_ec2_instance_aws_ec2_stop_post
+        tool_label: 停止 EC2
+        tool_configurations: {}
+        tool_parameters:
+          instance_id:
+            type: variable
+            value:
+            - param-extractor
+            - instance_id
+          region:
+            type: mixed
+            value: 'ap-northeast-1'
+      height: 90
+      id: 'tool-stop-ec2'
+      position: {x: 1000, y: 550}
+      positionAbsolute: {x: 1000, y: 550}
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+
+    # Route E: List S3
+    - data:
+        title: 列出 S3 Bucket
+        type: tool
+        provider_id: a3f28be8-a0df-4d09-bb14-727311d7b56d
+        provider_name: aws-lambda-manager
+        provider_type: api
+        tool_name: list_s3_buckets_aws_s3_buckets_get
+        tool_label: 列出 S3 Bucket
+        tool_configurations: {}
+        tool_parameters: {}
+      height: 90
+      id: 'tool-list-s3'
+      position: {x: 1000, y: 700}
+      positionAbsolute: {x: 1000, y: 700}
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+
+    # 5. End Node
+    - data:
+        title: 輸出結果
+        type: end
+        outputs:
+        - value_selector:
+          - 'llm-summary'
+          - text
+          variable: google_result
+        - value_selector:
+          - 'tool-list-ec2'
+          - text
+          variable: ec2_list_result
+        - value_selector:
+          - 'tool-start-ec2'
+          - text
+          variable: start_ec2_result
+        - value_selector:
+          - 'tool-stop-ec2'
+          - text
+          variable: stop_ec2_result
+        - value_selector:
+          - 'tool-list-s3'
+          - text
+          variable: s3_result
+      height: 90
+      id: 'end-node'
+      position: {x: 1900, y: 300}
+      positionAbsolute: {x: 1900, y: 300}
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: 0
+      y: 0
+      zoom: 1
