@@ -6,7 +6,7 @@
   },
 "servers": [
     {
-      "url": "https://irrigation-academic-december-filename.trycloudflare.com"
+      "url": "https://decorating-suggesting-header-muze.trycloudflare.com"
     }
   ],
   "paths": {
@@ -744,12 +744,24 @@
                 "type": "null"
               }
             ],
-            "title": "Keyword"
+            "title": "Keyword",
+            "description": "搜尋關鍵字，若要列出全部可留空"
           },
           "limit": {
             "type": "integer",
             "title": "Limit",
-            "default": 10
+            "description": "回傳筆數限制，預設 50 筆",
+            "default": 50
+          },
+          "sort": {
+            "type": "string",
+            "enum": [
+              "newest",
+              "oldest"
+            ],
+            "title": "Sort",
+            "description": "排序方式：'newest' 為最新(預設)，'oldest' 為最舊",
+            "default": "newest"
           }
         },
         "type": "object",
