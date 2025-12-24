@@ -28,8 +28,12 @@ except Exception:
 # ===========================
 
 # --- MySQL 相關 ---
+#class SearchRequest(BaseModel):(原本31、32行改成下面這個_12/23_edit)
+    #keyword: str
+# 修改 SearchRequest 模型
 class SearchRequest(BaseModel):
-    keyword: str
+    keyword: Optional[str] = None  # 變成可選，沒填就是 None
+    limit: int = 10                # 預設抓 10 筆，AI 可以自己改
 class AddRequest(BaseModel):
     title: str
     content: str
@@ -69,16 +73,44 @@ def get_conn():
         host=os.getenv("DB_HOST"), user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"), database=os.getenv("DB_NAME")
     )
-
+#更改原本78-85行內容邏輯有錯搜尋出來結果很奇怪_12/23_edit
 @app.post("/db/search", tags=["Database"])
 async def search_docs(req: SearchRequest):
     conn = get_conn()
     cursor = conn.cursor(dictionary=True)
     try:
-        sql = "SELECT * FROM document_store WHERE title LIKE %s OR content LIKE %s LIMIT 5"
-        cursor.execute(sql, (f"%{req.keyword}%", f"%{req.keyword}%"))
-        return {"result": cursor.fetchall() or "無相關資料"}
-    finally: conn.close()
+        # 1. 基礎 SQL：預設先選全部
+        sql = "SELECT * FROM document_store"
+        params = []
+
+        # 2. 判斷是否過濾：如果有提供 keyword，才加上 WHERE 條件
+        if req.keyword and req.keyword.strip():
+            sql += " WHERE title LIKE %s OR content LIKE %s"
+            # 準備參數
+            params.extend([f"%{req.keyword}%", f"%{req.keyword}%"])
+        
+        # 3. 排序：永遠加上由舊到新排序 (解決您看資料的問題[DESC(新到舊排序)/ASC)(舊到新排序)])
+        sql += " ORDER BY id ASC"
+
+        # 4. 限制筆數：加上 LIMIT
+        sql += " LIMIT %s"
+        params.append(req.limit)
+
+        # 5. 執行 SQL
+        cursor.execute(sql, tuple(params))
+        results = cursor.fetchall()
+        
+        # 6. 回傳結果
+        if not results:
+            return {"result": "無相關資料"}
+            
+        # 為了讓 AI 更好讀，我們可以簡單整理一下格式 (選擇性)
+        return {"result": results}
+
+    except Exception as e:
+        return {"result": f"搜尋發生錯誤: {str(e)}"}
+    finally:
+        conn.close()
 
 @app.post("/db/add", tags=["Database"])
 async def add_doc(req: AddRequest):
