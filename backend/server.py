@@ -4,8 +4,8 @@ import mysql.connector
 import uvicorn
 import boto3
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, Field
+from typing import Optional, Literal
 from dotenv import load_dotenv
 
 # 1. 載入環境變數
@@ -32,8 +32,9 @@ except Exception:
     #keyword: str
 # 修改 SearchRequest 模型
 class SearchRequest(BaseModel):
-    keyword: Optional[str] = None  # 變成可選，沒填就是 None
-    limit: int = 10                # 預設抓 10 筆，AI 可以自己改
+    keyword: Optional[str] = Field(None, description="搜尋關鍵字，若要列出全部可留空")
+    limit: int = Field(50, description="回傳筆數限制，預設 50 筆")
+    sort: Literal["newest", "oldest"] = Field("newest", description="排序方式：'newest' 為最新(預設)，'oldest' 為最舊")
 class AddRequest(BaseModel):
     title: str
     content: str
@@ -79,33 +80,50 @@ async def search_docs(req: SearchRequest):
     conn = get_conn()
     cursor = conn.cursor(dictionary=True)
     try:
-        # 1. 基礎 SQL：預設先選全部
+        # A. 基礎 SQL
         sql = "SELECT * FROM document_store"
         params = []
 
-        # 2. 判斷是否過濾：如果有提供 keyword，才加上 WHERE 條件
+        # B. 關鍵字過濾 (如果有填寫)
         if req.keyword and req.keyword.strip():
             sql += " WHERE title LIKE %s OR content LIKE %s"
-            # 準備參數
             params.extend([f"%{req.keyword}%", f"%{req.keyword}%"])
         
-        # 3. 排序：永遠加上由舊到新排序 (解決您看資料的問題[DESC(新到舊排序)/ASC)(舊到新排序)])
-        sql += " ORDER BY id ASC"
+        # C. 排序邏輯 (解決最新/最舊問題)
+        # 優先使用 created_at 排序，若時間相同則用 id 輔助
+        if req.sort == "oldest":
+            sql += " ORDER BY created_at ASC, id ASC"
+        else:
+            # 預設為 newest
+            sql += " ORDER BY created_at DESC, id DESC"
 
-        # 4. 限制筆數：加上 LIMIT
+        # D. 筆數限制 (解決只列出 10 筆的問題)
         sql += " LIMIT %s"
         params.append(req.limit)
 
-        # 5. 執行 SQL
+        # 執行查詢
         cursor.execute(sql, tuple(params))
         results = cursor.fetchall()
         
-        # 6. 回傳結果
+        # E. 結果回傳
         if not results:
             return {"result": "無相關資料"}
             
-        # 為了讓 AI 更好讀，我們可以簡單整理一下格式 (選擇性)
-        return {"result": results}
+        # 格式化輸出 (讓 AI 更容易閱讀時間)
+        formatted_results = []
+        for row in results:
+            # 確保 created_at 轉成字串，避免 JSON 序列化錯誤
+            created_time = row['created_at'].strftime("%Y-%m-%d %H:%M:%S") if row.get('created_at') else "未知時間"
+            formatted_results.append(
+                f"[ID: {row['id']}] {row['title']} (時間: {created_time})"
+            )
+            
+        # 回傳原本的 JSON 結構，或者合併後的字串都可以，這裡回傳結構化資料讓 Dify 自己組
+        return {
+            "count": len(results),
+            "data": results, 
+            "formatted_list": "\n".join(formatted_results) # 這是給 AI 偷懶直接讀的
+        }
 
     except Exception as e:
         return {"result": f"搜尋發生錯誤: {str(e)}"}
