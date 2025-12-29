@@ -1,9 +1,11 @@
 import os
+import mimetypes
 import time
 import mysql.connector
 import uvicorn
 import boto3
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from typing import Optional, Literal
 from dotenv import load_dotenv
@@ -17,8 +19,8 @@ app = FastAPI(title="AI Assistant - AWS Full Stack Manager")
 # === AWS 連線設定 ===
 # 嘗試讀取 mcp-user 設定，若無則使用預設
 try:
-    aws_session = boto3.Session(profile_name='mcp-user', region_name='ap-northeast-1')
-    print("✅ 成功載入 AWS profile: mcp-user")
+    aws_session = boto3.Session(profile_name='ai-mcp-user', region_name='ap-northeast-1')
+    print("✅ 成功載入 AWS profile: ai-mcp-user")
 except Exception:
     print("⚠️ 找不到 mcp-user，使用預設環境變數")
     aws_session = boto3.Session(region_name='ap-northeast-1')
@@ -33,7 +35,8 @@ except Exception:
 # 修改 SearchRequest 模型
 class SearchRequest(BaseModel):
     keyword: Optional[str] = Field(None, description="搜尋關鍵字，若要列出全部可留空")
-    limit: int = Field(50, description="回傳筆數限制，預設 50 筆")
+    # 設定上限避免查詢筆數無限制
+    limit: int = Field(50, ge=1, le=100, description="回傳筆數限制，預設 50 筆")
     sort: Literal["newest", "oldest"] = Field("newest", description="排序方式：'newest' 為最新(預設)，'oldest' 為最舊")
 class AddRequest(BaseModel):
     title: str
@@ -54,6 +57,7 @@ class S3FileRequest(BaseModel):
     file_name: str
     content: Optional[str] = "這是由 AI 自動建立的檔案內容" # 上傳時的內容
 
+
 # --- EC2 相關 (新增/修改/刪除) ---
 class EC2LaunchRequest(BaseModel):
     instance_type: str = "t2.micro"
@@ -65,6 +69,10 @@ class EC2ActionRequest(BaseModel):
 class EC2ModifyRequest(BaseModel):
     instance_id: str
     new_instance_type: str # 例如改成 "t3.medium"
+
+class EC2WaitRequest(BaseModel):
+    instance_id: str
+    target_state: Literal["running", "stopped", "terminated"]
 
 # ===========================
 #      原有 MySQL 功能區
@@ -128,6 +136,8 @@ async def search_docs(req: SearchRequest):
     except Exception as e:
         return {"result": f"搜尋發生錯誤: {str(e)}"}
     finally:
+        # 一律釋放資料庫資源
+        cursor.close()
         conn.close()
 
 @app.post("/db/add", tags=["Database"])
@@ -138,7 +148,13 @@ async def add_doc(req: AddRequest):
         cursor.execute("INSERT INTO document_store (title, content) VALUES (%s, %s)", (req.title, req.content))
         conn.commit()
         return {"result": f"✅ 已新增: {req.title}"}
-    finally: conn.close()
+    except Exception as e:
+        # 避免寫入失敗仍留有未結束的交易
+        conn.rollback()
+        return {"result": f"新增失敗: {str(e)}"}
+    finally:
+        cursor.close()
+        conn.close()
 
 @app.post("/db/update", tags=["Database"])
 async def update_doc(req: UpdateRequest):
@@ -147,14 +163,21 @@ async def update_doc(req: UpdateRequest):
     try:
         updates = []
         params = []
-        if req.title: updates.append("title=%s"); params.append(req.title)
-        if req.content: updates.append("content=%s"); params.append(req.content)
+        # 允許空字串作為明確更新值
+        if req.title is not None: updates.append("title=%s"); params.append(req.title)
+        if req.content is not None: updates.append("content=%s"); params.append(req.content)
         if not updates: return {"result": "無修改內容"}
         params.append(req.id)
         cursor.execute(f"UPDATE document_store SET {','.join(updates)} WHERE id=%s", tuple(params))
         conn.commit()
         return {"result": f"✅ 已更新 ID: {req.id}"}
-    finally: conn.close()
+    except Exception as e:
+        # 避免寫入失敗仍留有未結束的交易
+        conn.rollback()
+        return {"result": f"更新失敗: {str(e)}"}
+    finally:
+        cursor.close()
+        conn.close()
 
 @app.post("/db/delete", tags=["Database"])
 async def delete_doc(req: DeleteRequest):
@@ -164,11 +187,24 @@ async def delete_doc(req: DeleteRequest):
         cursor.execute("DELETE FROM document_store WHERE id=%s", (req.id,))
         conn.commit()
         return {"result": f"✅ 已刪除 ID: {req.id}"}
-    finally: conn.close()
+    except Exception as e:
+        # 避免寫入失敗仍留有未結束的交易
+        conn.rollback()
+        return {"result": f"刪除失敗: {str(e)}"}
+    finally:
+        cursor.close()
+        conn.close()
 
 # ===========================
 #        S3 功能全集
 # ===========================
+
+def iter_s3_body(body, chunk_size: int = 1024 * 1024):
+    while True:
+        chunk = body.read(chunk_size)
+        if not chunk:
+            break
+        yield chunk
 
 # 1. 查找 (Read): 列出 Buckets
 @app.post("/aws/s3/list_buckets", tags=["S3"], summary="列出所有 S3 Bucket")
@@ -201,16 +237,31 @@ async def s3_create_bucket(req: S3BucketRequest):
         return {"result": f"✅ Bucket '{req.bucket_name}' 建立成功！"}
     except Exception as e: return {"error": str(e)}
 
-# 4. 新增/更新 (Create/Update): 上傳或覆蓋檔案
-@app.post("/aws/s3/put_file", tags=["S3"], summary="上傳文字檔 (若存在則覆蓋/更新)")
-async def s3_put_file(req: S3FileRequest):
+# 4. 新增 (Create): multipart 上傳任何檔案
+@app.post("/aws/s3/upload_file", tags=["S3"], summary="multipart 上傳檔案")
+async def s3_upload_file(
+    bucket_name: str = Form(...),
+    file: UploadFile = File(...),
+    file_name: Optional[str] = Form(None),
+):
     try:
         s3 = aws_session.client('s3')
-        # 將字串轉為檔案上傳
-        s3.put_object(Bucket=req.bucket_name, Key=req.file_name, Body=req.content)
-        return {"result": f"✅ 檔案 '{req.file_name}' 已成功寫入 '{req.bucket_name}'。"}
-    except Exception as e: return {"error": str(e)}
+        key = file_name or file.filename
+        if not key:
+            raise HTTPException(status_code=400, detail="file_name or file.filename is required")
+        content_type = file.content_type or mimetypes.guess_type(key)[0]
+        extra_args = {"ContentType": content_type} if content_type else None
+        if extra_args:
+            s3.upload_fileobj(file.file, bucket_name, key, ExtraArgs=extra_args)
+        else:
+            s3.upload_fileobj(file.file, bucket_name, key)
+        return {"result": f"✅ 檔案 '{key}' 已上傳至 '{bucket_name}'。"}
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        await file.close()
 
+# 新增這個 API：透過 URL 上傳 
 # 5. 刪除 (Delete): 刪除檔案
 @app.post("/aws/s3/delete_file", tags=["S3"], summary="刪除 S3 檔案")
 async def s3_delete_file(req: S3FileRequest):
@@ -219,6 +270,20 @@ async def s3_delete_file(req: S3FileRequest):
         s3.delete_object(Bucket=req.bucket_name, Key=req.file_name)
         return {"result": f"🗑️ 檔案 '{req.file_name}' 已刪除。"}
     except Exception as e: return {"error": str(e)}
+
+# 5b. 查找 (Read): 下載檔案
+@app.post("/aws/s3/download_file", tags=["S3"], summary="下載 S3 檔案")
+async def s3_download_file(req: S3FileRequest):
+    try:
+        s3 = aws_session.client('s3')
+        url = s3.generate_presigned_url(
+            ClientMethod="get_object",
+            Params={"Bucket": req.bucket_name, "Key": req.file_name},
+            ExpiresIn=900,
+        )
+        return {"url": url, "method": "GET", "bucket": req.bucket_name, "key": req.file_name}
+    except Exception as e:
+        return {"error": str(e)}
 
 # 6. 刪除 (Delete): 刪除 Bucket (必須是空的)
 @app.post("/aws/s3/delete_bucket", tags=["S3"], summary="刪除 S3 Bucket")
@@ -239,16 +304,56 @@ async def ec2_list():
     try:
         ec2 = aws_session.client('ec2')
         res = ec2.describe_instances()
-        info = []
+        instances = []
         for r in res['Reservations']:
             for i in r['Instances']:
-                name = "無名稱"
-                # 嘗試讀取 Tag 中的 Name
-                if 'Tags' in i:
-                    for t in i['Tags']:
-                        if t['Key'] == 'Name': name = t['Value']
-                info.append(f"ID: {i['InstanceId']} | Name: {name} | 狀態: {i['State']['Name']} | 規格: {i['InstanceType']}")
-        return {"instances": info if info else "沒有 EC2 實體"}
+                tags = {t['Key']: t['Value'] for t in i.get('Tags', [])}
+                name = tags.get('Name', "無名稱")
+                instances.append({
+                    "id": i['InstanceId'],
+                    "name": name,
+                    "state": i['State']['Name'],
+                    "type": i['InstanceType'],
+                    "public_ip": i.get('PublicIpAddress'),
+                    "private_ip": i.get('PrivateIpAddress'),
+                    "tags": tags,
+                })
+        return {"instances": instances}
+    except Exception as e: return {"error": str(e)}
+
+# 1b. 查找 (Read): 單一 EC2 詳細資訊
+@app.post("/aws/ec2/get", tags=["EC2"], summary="查詢單一 EC2 詳細資訊")
+async def ec2_get(req: EC2ActionRequest):
+    try:
+        ec2 = aws_session.client('ec2')
+        res = ec2.describe_instances(InstanceIds=[req.instance_id])
+        inst = res['Reservations'][0]['Instances'][0]
+        tags = {t['Key']: t['Value'] for t in inst.get('Tags', [])}
+        name = tags.get('Name', "無名稱")
+        return {
+            "id": inst['InstanceId'],
+            "name": name,
+            "state": inst['State']['Name'],
+            "type": inst['InstanceType'],
+            "public_ip": inst.get('PublicIpAddress'),
+            "private_ip": inst.get('PrivateIpAddress'),
+            "tags": tags,
+        }
+    except Exception as e: return {"error": str(e)}
+
+# 1c. 查找 (Read): 等待狀態完成
+@app.post("/aws/ec2/wait_state", tags=["EC2"], summary="等待 EC2 進入指定狀態")
+async def ec2_wait_state(req: EC2WaitRequest):
+    try:
+        ec2 = aws_session.client('ec2')
+        waiter_map = {
+            "running": "instance_running",
+            "stopped": "instance_stopped",
+            "terminated": "instance_terminated",
+        }
+        waiter = ec2.get_waiter(waiter_map[req.target_state])
+        waiter.wait(InstanceIds=[req.instance_id])
+        return {"result": f"✅ 已進入 {req.target_state}: {req.instance_id}"}
     except Exception as e: return {"error": str(e)}
 
 # 2. 新增 (Create): 啟動新機器
@@ -313,4 +418,4 @@ async def ec2_terminate(req: EC2ActionRequest):
     except Exception as e: return {"error": str(e)}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)
