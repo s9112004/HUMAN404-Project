@@ -4,9 +4,9 @@
     "title": "AI Assistant - AWS Full Stack Manager",
     "version": "0.1.0"
   },
-"servers": [
+  "servers": [
     {
-      "url": "https://decorating-suggesting-header-muze.trycloudflare.com"
+      "url": "http://54.238.243.38:8001"
     }
   ],
   "paths": {
@@ -277,18 +277,18 @@
         }
       }
     },
-    "/aws/s3/put_file": {
+    "/aws/s3/upload_file": {
       "post": {
         "tags": [
           "S3"
         ],
-        "summary": "上傳文字檔 (若存在則覆蓋/更新)",
-        "operationId": "s3_put_file_aws_s3_put_file_post",
+        "summary": "multipart 上傳檔案",
+        "operationId": "s3_upload_file_aws_s3_upload_file_post",
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/S3FileRequest"
+                "$ref": "#/components/schemas/Body_s3_upload_file_aws_s3_upload_file_post"
               }
             }
           },
@@ -325,6 +325,47 @@
         ],
         "summary": "刪除 S3 檔案",
         "operationId": "s3_delete_file_aws_s3_delete_file_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/S3FileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/aws/s3/download_file": {
+      "post": {
+        "tags": [
+          "S3"
+        ],
+        "summary": "下載 S3 檔案",
+        "operationId": "s3_download_file_aws_s3_download_file_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -414,6 +455,88 @@
               "application/json": {
                 "schema": {
 
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/aws/ec2/get": {
+      "post": {
+        "tags": [
+          "EC2"
+        ],
+        "summary": "查詢單一 EC2 詳細資訊",
+        "operationId": "ec2_get_aws_ec2_get_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EC2ActionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/aws/ec2/wait_state": {
+      "post": {
+        "tags": [
+          "EC2"
+        ],
+        "summary": "等待 EC2 進入指定狀態",
+        "operationId": "ec2_wait_state_aws_ec2_wait_state_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EC2WaitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -617,6 +740,36 @@
         ],
         "title": "AddRequest"
       },
+      "Body_s3_upload_file_aws_s3_upload_file_post": {
+        "properties": {
+          "bucket_name": {
+            "type": "string",
+            "title": "Bucket Name"
+          },
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          },
+          "file_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bucket_name",
+          "file"
+        ],
+        "title": "Body_s3_upload_file_aws_s3_upload_file_post"
+      },
       "DeleteRequest": {
         "properties": {
           "id": {
@@ -676,6 +829,29 @@
           "new_instance_type"
         ],
         "title": "EC2ModifyRequest"
+      },
+      "EC2WaitRequest": {
+        "properties": {
+          "instance_id": {
+            "type": "string",
+            "title": "Instance Id"
+          },
+          "target_state": {
+            "type": "string",
+            "enum": [
+              "running",
+              "stopped",
+              "terminated"
+            ],
+            "title": "Target State"
+          }
+        },
+        "type": "object",
+        "required": [
+          "instance_id",
+          "target_state"
+        ],
+        "title": "EC2WaitRequest"
       },
       "HTTPValidationError": {
         "properties": {
@@ -749,6 +925,8 @@
           },
           "limit": {
             "type": "integer",
+            "maximum": 100,
+            "minimum": 1,
             "title": "Limit",
             "description": "回傳筆數限制，預設 50 筆",
             "default": 50
