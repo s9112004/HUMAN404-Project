@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://54.238.243.38:8001"
+      "url": "https://gratuit-ver-wage-groundwater.trycloudflare.com"
     }
   ],
   "paths": {
@@ -289,6 +289,47 @@
             "multipart/form-data": {
               "schema": {
                 "$ref": "#/components/schemas/Body_s3_upload_file_aws_s3_upload_file_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/aws/s3/upload_base64": {
+      "post": {
+        "tags": [
+          "S3"
+        ],
+        "summary": "JSON Base64 ",
+        "operationId": "s3_upload_base64_aws_s3_upload_base64_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/S3Base64UploadRequest"
               }
             }
           },
@@ -807,6 +848,31 @@
             "type": "string",
             "title": "Ami Id",
             "default": "ami-0aec5ae807cea9ce0"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tags"
           }
         },
         "type": "object",
@@ -865,6 +931,40 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "S3Base64UploadRequest": {
+        "properties": {
+          "bucket_name": {
+            "type": "string",
+            "title": "Bucket Name"
+          },
+          "file_name": {
+            "type": "string",
+            "title": "File Name"
+          },
+          "content_base64": {
+            "type": "string",
+            "title": "Content Base64"
+          },
+          "content_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bucket_name",
+          "file_name",
+          "content_base64"
+        ],
+        "title": "S3Base64UploadRequest"
       },
       "S3BucketRequest": {
         "properties": {
