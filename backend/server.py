@@ -1,5 +1,6 @@
 import os
 import mimetypes
+import base64
 import time
 import mysql.connector
 import uvicorn
@@ -57,11 +58,18 @@ class S3FileRequest(BaseModel):
     file_name: str
     content: Optional[str] = "這是由 AI 自動建立的檔案內容" # 上傳時的內容
 
+class S3Base64UploadRequest(BaseModel):
+    bucket_name: str
+    file_name: str
+    content_base64: str
+    content_type: Optional[str] = None
+
 
 # --- EC2 相關 (新增/修改/刪除) ---
 class EC2LaunchRequest(BaseModel):
     instance_type: str = "t2.micro"
     ami_id: str = "ami-0aec5ae807cea9ce0" # Ubuntu 24.04 (us-east-1)
+    name: Optional[str] = None
 
 class EC2ActionRequest(BaseModel):
     instance_id: str
@@ -232,8 +240,15 @@ async def s3_list_files(req: S3BucketRequest):
 async def s3_create_bucket(req: S3BucketRequest):
     try:
         s3 = aws_session.client('s3')
-        # us-east-1 不需要 LocationConstraint
-        s3.create_bucket(Bucket=req.bucket_name) 
+        # us-east-1 不需要 LocationConstraint，其他區域需指定
+        region = aws_session.region_name or "ap-northeast-1"
+        if region == "us-east-1":
+            s3.create_bucket(Bucket=req.bucket_name)
+        else:
+            s3.create_bucket(
+                Bucket=req.bucket_name,
+                CreateBucketConfiguration={"LocationConstraint": region}
+            )
         return {"result": f"✅ Bucket '{req.bucket_name}' 建立成功！"}
     except Exception as e: return {"error": str(e)}
 
@@ -260,6 +275,23 @@ async def s3_upload_file(
         return {"error": str(e)}
     finally:
         await file.close()
+
+# 4b.  (Create): JSON Base64 
+@app.post("/aws/s3/upload_base64", tags=["S3"], summary="JSON Base64 ")
+async def s3_upload_base64(req: S3Base64UploadRequest):
+    try:
+        s3 = aws_session.client('s3')
+        content_type = req.content_type or mimetypes.guess_type(req.file_name)[0]
+        data = base64.b64decode(req.content_base64)
+        extra_args = {"ContentType": content_type} if content_type else None
+        if extra_args:
+            s3.put_object(Bucket=req.bucket_name, Key=req.file_name, Body=data, **extra_args)
+        else:
+            s3.put_object(Bucket=req.bucket_name, Key=req.file_name, Body=data)
+        return {"result": f"? ?? '{req.file_name}' ???? '{req.bucket_name}'?"}
+    except Exception as e:
+        return {"error": str(e)}
+
 
 # 新增這個 API：透過 URL 上傳 
 # 5. 刪除 (Delete): 刪除檔案
@@ -361,9 +393,12 @@ async def ec2_wait_state(req: EC2WaitRequest):
 async def ec2_launch(req: EC2LaunchRequest):
     try:
         ec2 = aws_session.resource('ec2')
+        tags = []
+        name = req.name or "AI-Created-Server"
+        tags.append({"Key": "Name", "Value": name})
         instances = ec2.create_instances(
             ImageId=req.ami_id, MinCount=1, MaxCount=1, InstanceType=req.instance_type,
-            TagSpecifications=[{'ResourceType': 'instance','Tags': [{'Key': 'Name', 'Value': 'AI-Created-Server'}]}]
+            TagSpecifications=[{'ResourceType': 'instance','Tags': tags}]
         )
         return {"result": f"🚀 機器啟動中，ID: {instances[0].id}"}
     except Exception as e: return {"error": str(e)}
